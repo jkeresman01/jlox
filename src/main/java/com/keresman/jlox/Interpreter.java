@@ -1,14 +1,24 @@
 package com.keresman.jlox;
 
-class Interpreter implements Expr.Visitor<Object>{
+import java.util.List;
 
-    void interpert(Expr experssion) {
+class Interpreter implements
+        Expr.Visitor<Object>,
+        Stmt.Visitor<Void>
+{
+
+    void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(experssion);
-            System.out.println(stringify(value));
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
         } catch (RuntimeError error) {
             Jlox.runtimeError(error);
         }
+    }
+
+    private void execute(Stmt statement) {
+        statement.accept(this);
     }
 
     private String stringify(Object object) {
@@ -125,4 +135,16 @@ class Interpreter implements Expr.Visitor<Object>{
         return expression.accept(this);
     }
 
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
 }
