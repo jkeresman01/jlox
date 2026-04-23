@@ -33,8 +33,6 @@ public class GenerateAst {
 
         writer.println("package com.keresman.jlox;");
         writer.println();
-        writer.println("import java.util.List;");
-        writer.println();
         writer.println("abstract class %s {".formatted(baseName));
 
         // The AST classes
@@ -53,7 +51,7 @@ public class GenerateAst {
                                    String className,
                                    String fieldList) {
 
-        writer.println(" static class %s extends %s {".formatted(className, baseName));
+        writer.println("    static class %s extends %s {".formatted(className, baseName));
 
         //Constructor
         writer.println("       %s(%s) {".formatted(className, fieldList));
