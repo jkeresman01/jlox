@@ -10,7 +10,11 @@ import java.util.List;
 
 public class Jlox {
 
+    private static final Interpreter interpreter = new Interpreter();
+
     static boolean hadError = false;
+    static boolean hadRuntimeError = false;
+
 
     public static void main(String[] args) throws IOException {
 
@@ -32,6 +36,10 @@ public class Jlox {
         //Indicate an error in the exit code
         if (hadError) {
             System.exit(65);
+        }
+
+        if(hadRuntimeError) {
+            System.exit(70);
         }
     }
 
@@ -66,6 +74,8 @@ public class Jlox {
         //Stop if there was a syntax error
         if(hadError) return;
 
+        interpreter.interpert(expression);
+
         System.out.println(new AstPrinter().print(expression));
     }
 
@@ -85,5 +95,11 @@ public class Jlox {
     private static void report(int line, String where, String message) {
         System.err.println("[line " + line + "] Error" + where + ": " + message);
         hadError = true;
+    }
+
+    static void runtimeError(RuntimeError error) {
+        System.err.println(
+                error.getMessage() + "\n]line " + error.token.line() + "]");
+        hadRuntimeError = true;
     }
 }
