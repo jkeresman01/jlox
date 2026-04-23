@@ -33,7 +33,7 @@ public class GenerateAst {
 
         writer.println("package com.keresman.jlox;");
         writer.println();
-        writer.println("import java.util.List");
+        writer.println("import java.util.List;");
         writer.println();
         writer.println("abstract class %s {".formatted(baseName));
 
@@ -62,11 +62,18 @@ public class GenerateAst {
         String[] fields = fieldList.split(", ");
         for (String field : fields) {
             String name = field.split(" ")[1];
-            writer.println("     this." + name + " = "  + name  +";");
+            writer.println("           this." + name + " = "  + name  +";");
         }
 
-
-        //Closing }
+        // Constructors closing }
         writer.println("       }");
+
+        writer.println();
+        for (String field : fields) {
+            writer.println("     final %s ;".formatted(field));
+        }
+
+        writer.println("  }");
+        writer.println();
     }
 }
