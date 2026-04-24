@@ -1,0 +1,4 @@
+class SnowWhite {}
+
+var snowWhite = SnowWhite();
+print snowWhite;
