@@ -271,6 +271,15 @@ class Interpreter implements
 
     @Override
     public Void visitClassStmt(Stmt.Class stmt) {
+        Object superclass = null;
+        if (stmt.superclass != null) {
+            superclass = evaluate(stmt.superclass);
+            if (!(superclass instanceof JloxClass)) {
+                throw new RuntimeError(stmt.superclass.name,
+                        "Superclass must be a class.");
+            }
+        }
+
         environment.define(stmt.name.lexeme(), null);
         Map<String, JloxFunction> methods = new HashMap<>();
 
@@ -280,7 +289,7 @@ class Interpreter implements
             methods.put(method.name.lexeme(), function);
         }
 
-        JloxClass jloxClass = new JloxClass(stmt.name.lexeme(), methods);
+        JloxClass jloxClass = new JloxClass(stmt.name.lexeme(), (JloxClass)superclass,  methods);
         environment.assign(stmt.name, jloxClass);
         return null;
     }

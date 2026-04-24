@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 class JloxClass implements JloxCallable{
+
     final String name;
+    final JloxClass superclass;
     private final Map<String, JloxFunction> methods;
 
-    JloxClass(String name, Map<String, JloxFunction> methods) {
+    JloxClass(String name, JloxClass superclass, Map<String, JloxFunction> methods) {
         this.name = name;
+        this.superclass = superclass;
         this.methods = methods;
     }
 
@@ -43,6 +46,10 @@ class JloxClass implements JloxCallable{
     JloxFunction findMethod(String name) {
         if(methods.containsKey(name)) {
             return methods.get(name);
+        }
+
+        if(superclass != null) {
+            return superclass.findMethod(name);
         }
 
         return null;

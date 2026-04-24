@@ -1,0 +1,10 @@
+class SuperSnowWhite {
+    sayHi() {
+        print "Hello from Snow White";
+    }
+}
+
+class SnowWhite < SuperSnowWhite { }
+
+var snowWhite = SnowWhite();
+snowWhite.sayHi();
