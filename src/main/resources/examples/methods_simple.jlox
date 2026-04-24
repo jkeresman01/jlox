@@ -1,0 +1,8 @@
+class SnowWhite {
+    sayHi() {
+        print "Hi Snow White";
+    }
+}
+
+var snowWhite = SnowWhite();
+snowWhite.sayHi();

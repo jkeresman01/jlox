@@ -155,6 +155,34 @@ class Interpreter implements
     }
 
     @Override
+    public Object visitGetExpr(Expr.Get expr) {
+        Object object = evaluate(expr.object);
+
+        if (object instanceof JloxInstance jloxInstance) {
+            return jloxInstance.get(expr.name);
+        }
+
+        throw new RuntimeError(expr.name,
+                "Only instances can have properties");
+    }
+
+    @Override
+    public Object visitSetExpr(Expr.Set expr) {
+        Object object = evaluate(expr.object);
+        if(!(object instanceof JloxInstance)) {
+            throw new RuntimeError(
+                    expr.name,
+                    "Only instances have fields"
+            );
+        }
+
+        Object value = evaluate(expr.value);
+        ((JloxInstance)object).set(expr.name, value);
+
+        return value;
+    }
+
+    @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
     }
@@ -239,7 +267,14 @@ class Interpreter implements
     @Override
     public Void visitClassStmt(Stmt.Class stmt) {
         environment.define(stmt.name.lexeme(), null);
-        JloxClass jloxClass = new JloxClass(stmt.name.lexeme());
+        Map<String, JloxFunction> methods = new HashMap<>();
+
+        for (Stmt.Function method : stmt.methods) {
+            JloxFunction function = new JloxFunction(method, environment);
+            methods.put(method.name.lexeme(), function);
+        }
+
+        JloxClass jloxClass = new JloxClass(stmt.name.lexeme(), methods);
         environment.assign(stmt.name, jloxClass);
         return null;
     }

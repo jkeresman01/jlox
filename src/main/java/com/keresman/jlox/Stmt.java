@@ -29,9 +29,9 @@ abstract class Stmt {
   }
 
     static class Class extends Stmt {
-       Class(Token name, List<Stmt.Function> statements) {
+       Class(Token name, List<Stmt.Function> methods) {
            this.name = name;
-           this.statements = statements;
+           this.methods = methods;
        }
 
      @Override
@@ -40,7 +40,7 @@ abstract class Stmt {
       }
 
      final Token name;
-     final List<Stmt.Function> statements;
+     final List<Stmt.Function> methods;
   }
 
     static class Expression extends Stmt {

@@ -1,12 +1,15 @@
 package com.keresman.jlox;
 
 import java.util.List;
+import java.util.Map;
 
 class JloxClass implements JloxCallable{
     final String name;
+    private final Map<String, JloxFunction> methods;
 
-    JloxClass(String name) {
+    JloxClass(String name, Map<String, JloxFunction> methods) {
         this.name = name;
+        this.methods = methods;
     }
 
     @Override
@@ -23,5 +26,13 @@ class JloxClass implements JloxCallable{
     public Object call(Interpreter interpreter, List<Object> arguments) {
         JloxInstance jloxInstance = new JloxInstance(this);
         return jloxInstance;
+    }
+
+    JloxFunction findMethod(String name) {
+        if(methods.containsKey(name)) {
+            return methods.get(name);
+        }
+
+        return null;
     }
 }
