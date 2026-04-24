@@ -188,6 +188,21 @@ class Interpreter implements
     }
 
     @Override
+    public Object visitSuperExpr(Expr.Super expr) {
+        Integer distance = locals.get(expr);
+        JloxClass superclass = (JloxClass)environment.getAt(distance, "super");
+        JloxInstance object = (JloxInstance)environment.getAt(distance - 1, "this");
+        JloxFunction method = superclass.findMethod(expr.method.lexeme());
+
+        if (method == null) {
+            throw new RuntimeError(expr.method,
+                    "Undefined property '" + expr.method.lexeme() + " .");
+        }
+
+        return method.bind(object);
+    }
+
+    @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
     }
@@ -281,6 +296,12 @@ class Interpreter implements
         }
 
         environment.define(stmt.name.lexeme(), null);
+
+        if (stmt.superclass != null) {
+            environment = new Environment(environment);
+            environment.define("super", superclass);
+        }
+
         Map<String, JloxFunction> methods = new HashMap<>();
 
         for (Stmt.Function method : stmt.methods) {
@@ -290,6 +311,11 @@ class Interpreter implements
         }
 
         JloxClass jloxClass = new JloxClass(stmt.name.lexeme(), (JloxClass)superclass,  methods);
+
+        if(superclass != null) {
+            environment = environment.enclosing;
+        }
+
         environment.assign(stmt.name, jloxClass);
         return null;
     }

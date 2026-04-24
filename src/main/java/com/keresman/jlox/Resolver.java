@@ -13,13 +13,14 @@ class Resolver implements
         NONE,
         FUNCTION,
         INITIALIZER,
-        METHOD
+        METHOD,
     }
 
 
     private enum ClassType {
         NONE,
-        CLASS
+        CLASS,
+        SUBCLASS
     }
 
     private final Interpreter interpreter;
@@ -74,6 +75,20 @@ class Resolver implements
         if (currentClass == ClassType.NONE) {
             Jlox.error(expr.keyword,
                     "Can't use 'this' outisde of a class");
+        }
+
+        resolveLocal(expr, expr.keyword);
+        return null;
+    }
+
+    @Override
+    public Void visitSuperExpr(Expr.Super expr) {
+        if (currentClass == ClassType.NONE) {
+            Jlox.error(expr.keyword,
+                    "Can't user 'super' outside a class");
+        } else if(currentClass != ClassType.SUBCLASS) {
+            Jlox.error(expr.keyword,
+                    "Can't use 'super' in a class with no superclass");
         }
 
         resolveLocal(expr, expr.keyword);
@@ -148,7 +163,13 @@ class Resolver implements
         }
 
         if (stmt.superclass != null) {
+            currentClass = ClassType.SUBCLASS;
             resolve(stmt.superclass);
+        }
+
+        if(stmt.superclass != null) {
+            beginScope();
+            scopes.peek().put("super", true);
         }
 
         beginScope();
@@ -163,6 +184,10 @@ class Resolver implements
         }
 
         endScope();
+
+        if(stmt.superclass != null) {
+            endScope();
+        }
 
         currentClass = enclosingClass;
 
