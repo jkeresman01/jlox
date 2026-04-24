@@ -6,10 +6,13 @@ class JloxFunction implements JloxCallable{
 
     private final Stmt.Function declaration;
     private final Environment closure;
+    private boolean isInitalizer;
 
-    JloxFunction(Stmt.Function declaration, Environment closure) {
+
+    JloxFunction(Stmt.Function declaration, Environment closure, boolean isInitalizer) {
         this.declaration = declaration;
         this.closure = closure;
+        this.isInitalizer = isInitalizer;
     }
 
     @Override
@@ -20,7 +23,7 @@ class JloxFunction implements JloxCallable{
     JloxFunction bind(JloxInstance instance) {
         Environment environment = new Environment(closure);
         environment.define("this", instance);
-        return new JloxFunction(declaration, environment);
+        return new JloxFunction(declaration, environment, isInitalizer);
     }
 
     @Override
@@ -37,7 +40,15 @@ class JloxFunction implements JloxCallable{
         try{
             interpreter.executeBlock(declaration.body, environment);
         } catch (Return returnValue) {
+            if (isInitalizer) {
+                return closure.getAt(0, "this");
+            }
+
             return returnValue.value;
+        }
+
+        if (isInitalizer) {
+            return closure.getAt(0, "this");
         }
 
         return null;

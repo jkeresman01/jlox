@@ -12,6 +12,7 @@ class Resolver implements
     private enum FunctionType {
         NONE,
         FUNCTION,
+        INITIALIZER,
         METHOD
     }
 
@@ -146,6 +147,9 @@ class Resolver implements
 
         for(Stmt.Function method : stmt.methods) {
             FunctionType declaration = FunctionType.METHOD;
+            if (method.name.lexeme().equals("init")) {
+                declaration = FunctionType.INITIALIZER;
+            }
             resolveFunction(method, declaration);
         }
 
@@ -229,6 +233,11 @@ class Resolver implements
         }
 
         if(stmt.value != null) {
+            if (currentFunction == FunctionType.INITIALIZER) {
+                Jlox.error(stmt.keyword,
+                        "Can't return a value from an initalizer");
+            }
+
             resolve(stmt.value);
         }
 

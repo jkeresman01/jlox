@@ -19,12 +19,24 @@ class JloxClass implements JloxCallable{
 
     @Override
     public int arity() {
-        return 0;
+        JloxFunction initalizer = findMethod("init");
+
+        if (initalizer == null) {
+            return 0;
+        }
+
+        return initalizer.arity();
     }
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
         JloxInstance jloxInstance = new JloxInstance(this);
+
+        JloxFunction initalizer = findMethod("init");
+        if (initalizer != null) {
+            initalizer.bind(jloxInstance).call(interpreter, arguments);
+        }
+
         return jloxInstance;
     }
 

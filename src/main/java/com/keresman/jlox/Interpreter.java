@@ -275,7 +275,8 @@ class Interpreter implements
         Map<String, JloxFunction> methods = new HashMap<>();
 
         for (Stmt.Function method : stmt.methods) {
-            JloxFunction function = new JloxFunction(method, environment);
+            boolean isInitalizer = method.name.lexeme().equals("init");
+            JloxFunction function = new JloxFunction(method, environment, isInitalizer);
             methods.put(method.name.lexeme(), function);
         }
 
@@ -305,7 +306,7 @@ class Interpreter implements
 
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
-        JloxFunction jloxFunction = new JloxFunction(stmt, environment);
+        JloxFunction jloxFunction = new JloxFunction(stmt, environment, false);
         environment.define(stmt.name.lexeme(), jloxFunction);
         return null;
     }

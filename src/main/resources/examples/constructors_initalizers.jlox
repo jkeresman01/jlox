@@ -1,0 +1,22 @@
+class SnowWhite {
+    init() {
+        print "init() has been called";
+    }
+
+    sayName() {
+        print "Hello I don't know the name";
+    }
+
+    sayHi() {
+        print "Hello from Snow White";
+    }
+}
+
+var snowWhite = SnowWhite();
+snowWhite.init();
+snowWhite.init();
+snowWhite.init();
+snowWhite.init();
+
+snowWhite.sayHi();
+snowWhite.sayName();
