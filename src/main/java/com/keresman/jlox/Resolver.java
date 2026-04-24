@@ -15,9 +15,17 @@ class Resolver implements
         METHOD
     }
 
+
+    private enum ClassType {
+        NONE,
+        CLASS
+    }
+
     private final Interpreter interpreter;
-    private FunctionType currentFunction = FunctionType.NONE;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+
+    private FunctionType currentFunction = FunctionType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -57,6 +65,17 @@ class Resolver implements
     public Void visitSetExpr(Expr.Set expr) {
         resolve(expr.value);
         resolve(expr.object);
+        return null;
+    }
+
+    @Override
+    public Void visitThisExpr(Expr.This expr) {
+        if (currentClass == ClassType.NONE) {
+            Jlox.error(expr.keyword,
+                    "Can't use 'this' outisde of a class");
+        }
+
+        resolveLocal(expr, expr.keyword);
         return null;
     }
 
@@ -116,13 +135,23 @@ class Resolver implements
 
     @Override
     public Void visitClassStmt(Stmt.Class stmt) {
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType.CLASS;
+
         declare(stmt.name);
         define(stmt.name);
+
+        beginScope();
+        scopes.peek().put("this", true);
 
         for(Stmt.Function method : stmt.methods) {
             FunctionType declaration = FunctionType.METHOD;
             resolveFunction(method, declaration);
         }
+
+        endScope();
+
+        currentClass = enclosingClass;
 
         return null;
     }

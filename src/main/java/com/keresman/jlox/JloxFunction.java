@@ -17,6 +17,12 @@ class JloxFunction implements JloxCallable{
         return declaration.params.size();
     }
 
+    JloxFunction bind(JloxInstance instance) {
+        Environment environment = new Environment(closure);
+        environment.define("this", instance);
+        return new JloxFunction(declaration, environment);
+    }
+
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
         Environment environment = new Environment(closure);
