@@ -234,7 +234,7 @@ class Interpreter implements
 
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
-        JloxFunction jloxFunction = new JloxFunction(stmt);
+        JloxFunction jloxFunction = new JloxFunction(stmt, environment);
         environment.define(stmt.name.lexeme(), jloxFunction);
         return null;
     }

@@ -5,9 +5,11 @@ import java.util.List;
 class JloxFunction implements JloxCallable{
 
     private final Stmt.Function declaration;
+    private final Environment closure;
 
-    JloxFunction(Stmt.Function declaration) {
+    JloxFunction(Stmt.Function declaration, Environment closure) {
         this.declaration = declaration;
+        this.closure = closure;
     }
 
     @Override
@@ -17,7 +19,7 @@ class JloxFunction implements JloxCallable{
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
-        Environment environment = new Environment(interpreter.globals);
+        Environment environment = new Environment(closure);
 
         for (int i = 0; i < declaration.params.size(); ++i) {
             environment.define(
