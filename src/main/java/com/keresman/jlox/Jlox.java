@@ -75,6 +75,9 @@ public class Jlox {
         //Stop if there was a syntax error
         if(hadError) return;
 
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(stmts);
+
         interpreter.interpret(stmts);
 
         //System.out.println(new AstPrinter().print(expression));
