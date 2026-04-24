@@ -1,0 +1,12 @@
+print "works!";
+
+var a = 10;
+var b = 20;
+
+if(b > a) {
+    print "B is greater that A";
+} else {
+    print "B is less that A";
+}
+
+print a + b;
