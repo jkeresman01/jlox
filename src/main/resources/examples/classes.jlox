@@ -1,0 +1,7 @@
+class CuteSnowWhite {
+    sayHi() {
+        return "Hi Snow White";
+    }
+}
+
+print CuteSnowWhite;

@@ -236,6 +236,14 @@ class Interpreter implements
         return null;
     }
 
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        environment.define(stmt.name.lexeme(), null);
+        JloxClass jloxClass = new JloxClass(stmt.name.lexeme());
+        environment.assign(stmt.name, jloxClass);
+        return null;
+    }
+
     void executeBlock(List<Stmt> statements, Environment environment) {
         Environment previous = this.environment;
 ;
