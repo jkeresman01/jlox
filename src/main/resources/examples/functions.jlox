@@ -1,0 +1,5 @@
+fun saySnowWhite(snow, white) {
+    print "Hi, " + snow + " " + white + "!";
+}
+
+saySnowWhite("Snow", "White");

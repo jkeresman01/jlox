@@ -1,13 +1,31 @@
 package com.keresman.jlox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class Interpreter implements
         Expr.Visitor<Object>,
         Stmt.Visitor<Void>
 {
+    final Environment globals = new Environment();
+    private Environment environment = globals;
 
-    private Environment environment = new Environment();
+    Interpreter() {
+        globals.define("clock", new JloxCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return (double)System.currentTimeMillis() / 1000.0;
+            }
+
+            @Override
+            public String toString() { return "<native fn>"; }
+        });
+    }
 
     void interpret(List<Stmt> statements) {
         try {
@@ -80,6 +98,33 @@ class Interpreter implements
         }
 
         return null;
+    }
+
+    @Override
+    public Object visitCallExpr(Expr.Call expr) {
+        Object callee = evaluate(expr.callee);
+
+        List<Object> arguments = new ArrayList<>();
+
+        for (Expr argument : expr.arguments) {
+            arguments.add(evaluate(argument));
+        }
+
+        if(!(callee instanceof JloxCallable)) {
+            throw new RuntimeError(expr.paren,
+                    "Can only call functions and classes " +
+                            "(don't vomit ClassCast exception)");
+        }
+
+        JloxCallable function = (JloxCallable) callee;
+
+        if(arguments.size() != function.arity()) {
+            throw new RuntimeError(expr.paren,
+                    "Expected %d arguments but got %d."
+                            .formatted(function.arity(), arguments.size()));
+        }
+
+        return function.call(this, arguments);
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
@@ -168,9 +213,9 @@ class Interpreter implements
         return null;
     }
 
-    private void executeBlock(List<Stmt> statements, Environment environment) {
+    void executeBlock(List<Stmt> statements, Environment environment) {
         Environment previous = this.environment;
-
+;
         try{
             this.environment = environment;
             for (Stmt statement : statements) {
@@ -184,6 +229,13 @@ class Interpreter implements
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitFunctionStmt(Stmt.Function stmt) {
+        JloxFunction jloxFunction = new JloxFunction(stmt);
+        environment.define(stmt.name.lexeme(), jloxFunction);
         return null;
     }
 
