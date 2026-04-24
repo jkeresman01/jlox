@@ -72,11 +72,14 @@ public class Jlox {
         Parser parser = new Parser(tokens);
         List<Stmt> stmts = parser.parse();
 
-        //Stop if there was a syntax error
+        //Stop if there was a syntax errors
         if(hadError) return;
 
         Resolver resolver = new Resolver(interpreter);
         resolver.resolve(stmts);
+
+        //Stop if there was a resolution errors
+        if(hadError) return;
 
         interpreter.interpret(stmts);
 

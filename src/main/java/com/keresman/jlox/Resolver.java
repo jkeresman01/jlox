@@ -9,7 +9,13 @@ class Resolver implements
         Expr.Visitor<Void>,
         Stmt.Visitor<Void>{
 
+    private enum FunctionType {
+        NONE,
+        FUNCTION
+    }
+
     private final Interpreter interpreter;
+    private FunctionType currentFunction = FunctionType.NONE;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
 
     Resolver(Interpreter interpreter) {
@@ -125,11 +131,14 @@ class Resolver implements
     public Void visitFunctionStmt(Stmt.Function stmt) {
         declare(stmt.name);
         define(stmt.name);
-        resolveFunction(stmt);
+        resolveFunction(stmt, FunctionType.FUNCTION);
         return null;
     }
 
-    private void resolveFunction(Stmt.Function function) {
+    private void resolveFunction(Stmt.Function function, FunctionType functionType) {
+        FunctionType enclosingFunction = currentFunction;
+        currentFunction = functionType;
+
         beginScope();
 
         for(Token param : function.params) {
@@ -139,6 +148,7 @@ class Resolver implements
 
         resolve(function.body);
         endScope();
+        currentFunction = enclosingFunction;
     }
 
     @Override
@@ -158,6 +168,10 @@ class Resolver implements
 
     @Override
     public Void visitReturnStmt(Stmt.Return stmt) {
+        if (currentFunction == FunctionType.NONE) {
+            Jlox.error(stmt.keyword, "Can't return from top-level code!");
+        }
+
         if(stmt.value != null) {
             resolve(stmt.value);
         }
@@ -193,6 +207,12 @@ class Resolver implements
            return;
 
        Map<String, Boolean> scope = scopes.peek();
+
+       if (scope.containsKey(name.lexeme())) {
+           Jlox.error(name,
+                   "Already a variable with this name in this scope.");
+       }
+
        scope.put(name.lexeme(), false);
     }
 }
