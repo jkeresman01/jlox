@@ -6,5 +6,10 @@ class SuperSnowWhite {
 
 class SnowWhite < SuperSnowWhite { }
 
+class StarWarsGirls < SnowWhite {}
+
 var snowWhite = SnowWhite();
 snowWhite.sayHi();
+
+var starWarsGirl = StarWarsGirls();
+starWarsGirl.sayHi();
