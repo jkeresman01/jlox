@@ -1,6 +1,6 @@
 package com.keresman.jlox;
 
-class Return extends RuntimeException{
+class Return extends RuntimeException {
 
     final Object value;
 

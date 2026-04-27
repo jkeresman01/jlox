@@ -7,8 +7,7 @@ import java.util.Map;
 
 class Interpreter implements
         Expr.Visitor<Object>,
-        Stmt.Visitor<Void>
-{
+        Stmt.Visitor<Void> {
     final Environment globals = new Environment();
     private Environment environment = globals;
 
@@ -23,11 +22,13 @@ class Interpreter implements
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                return (double)System.currentTimeMillis() / 1000.0;
+                return (double) System.currentTimeMillis() / 1000.0;
             }
 
             @Override
-            public String toString() { return "<native fn>"; }
+            public String toString() {
+                return "<native fn>";
+            }
         });
     }
 
@@ -46,12 +47,12 @@ class Interpreter implements
     }
 
     private String stringify(Object object) {
-        if(object == null ) return "nil";
+        if (object == null) return "nil";
 
         if (object instanceof Double) {
             String text = object.toString();
 
-            if(text.endsWith(".0")) {
+            if (text.endsWith(".0")) {
                 text = text.substring(0, text.length() - 2);
             }
 
@@ -69,7 +70,7 @@ class Interpreter implements
         switch (expr.operator.tokenType()) {
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left - (double) right;
+                return (double) left - (double) right;
             case PLUS:
                 if (left instanceof Double leftDouble && right instanceof Double rightDouble) {
                     return leftDouble + rightDouble;
@@ -79,22 +80,22 @@ class Interpreter implements
                 }
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left / (double) right;
+                return (double) left / (double) right;
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left * (double) right;
+                return (double) left * (double) right;
             case GREATER:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left > (double) right;
+                return (double) left > (double) right;
             case GREATER_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left >= (double) right;
+                return (double) left >= (double) right;
             case LESS:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left < (double) right;
+                return (double) left < (double) right;
             case LESS_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left <= (double) right;
+                return (double) left <= (double) right;
             case BANG_EQUAL:
                 return !isEqual(left, right);
             case EQUAL_EQUAL:
@@ -114,7 +115,7 @@ class Interpreter implements
             arguments.add(evaluate(argument));
         }
 
-        if(!(callee instanceof JloxCallable)) {
+        if (!(callee instanceof JloxCallable)) {
             throw new RuntimeError(expr.paren,
                     "Can only call functions and classes " +
                             "(don't vomit ClassCast exception)");
@@ -122,7 +123,7 @@ class Interpreter implements
 
         JloxCallable function = (JloxCallable) callee;
 
-        if(arguments.size() != function.arity()) {
+        if (arguments.size() != function.arity()) {
             throw new RuntimeError(expr.paren,
                     "Expected %d arguments but got %d."
                             .formatted(function.arity(), arguments.size()));
@@ -135,15 +136,16 @@ class Interpreter implements
         if (operand instanceof Double) return;
         throw new RuntimeError(operator, "Operand must be a number!");
     }
+
     private void checkNumberOperands(Token operator, Object left, Object right) {
         if (left instanceof Double && right instanceof Double) return;
         throw new RuntimeError(operator, "Operands must be numbers!");
     }
 
     private boolean isEqual(Object left, Object right) {
-        if(left == null && right == null) return true;
+        if (left == null && right == null) return true;
 
-        if(left == null) return false;
+        if (left == null) return false;
 
         return left.equals(right);
 
@@ -169,7 +171,7 @@ class Interpreter implements
     @Override
     public Object visitSetExpr(Expr.Set expr) {
         Object object = evaluate(expr.object);
-        if(!(object instanceof JloxInstance)) {
+        if (!(object instanceof JloxInstance)) {
             throw new RuntimeError(
                     expr.name,
                     "Only instances have fields"
@@ -177,7 +179,7 @@ class Interpreter implements
         }
 
         Object value = evaluate(expr.value);
-        ((JloxInstance)object).set(expr.name, value);
+        ((JloxInstance) object).set(expr.name, value);
 
         return value;
     }
@@ -190,8 +192,8 @@ class Interpreter implements
     @Override
     public Object visitSuperExpr(Expr.Super expr) {
         Integer distance = locals.get(expr);
-        JloxClass superclass = (JloxClass)environment.getAt(distance, "super");
-        JloxInstance object = (JloxInstance)environment.getAt(distance - 1, "this");
+        JloxClass superclass = (JloxClass) environment.getAt(distance, "super");
+        JloxInstance object = (JloxInstance) environment.getAt(distance - 1, "this");
         JloxFunction method = superclass.findMethod(expr.method.lexeme());
 
         if (method == null) {
@@ -211,10 +213,10 @@ class Interpreter implements
     public Object visitLogicalExpr(Expr.Logical expr) {
         Object left = evaluate(expr.left);
 
-        if(expr.operator.tokenType() == TokenType.OR) {
-            if(isTruthy(left)) return left;
+        if (expr.operator.tokenType() == TokenType.OR) {
+            if (isTruthy(left)) return left;
         } else {
-            if(!isTruthy(left)) return left;
+            if (!isTruthy(left)) return left;
         }
 
         return evaluate(expr.right);
@@ -229,11 +231,11 @@ class Interpreter implements
                 return !isTruthy(right);
             case MINUS:
                 checkNumberOperand(expr.operator, right);
-                return -(double)right;
+                return -(double) right;
         }
 
         //unreachable
-        return  null;
+        return null;
     }
 
     @Override
@@ -244,7 +246,7 @@ class Interpreter implements
     private Object lookupVariable(Token name, Expr expr) {
         Integer distance = locals.get(expr);
 
-        if(distance != null) {
+        if (distance != null) {
             return environment.getAt(distance, name.lexeme());
         } else {
             return globals.get(name);
@@ -257,7 +259,7 @@ class Interpreter implements
 
         Integer distance = locals.get(expr);
 
-        if(distance != null) {
+        if (distance != null) {
             environment.assignAt(distance, expr.name, value);
         } else {
             globals.assign(expr.name, value);
@@ -268,9 +270,9 @@ class Interpreter implements
     }
 
     private boolean isTruthy(Object object) {
-        if(object == null) return false;
+        if (object == null) return false;
 
-        if(object instanceof Boolean) return (boolean) object;
+        if (object instanceof Boolean) return (boolean) object;
         return true;
     }
 
@@ -310,9 +312,9 @@ class Interpreter implements
             methods.put(method.name.lexeme(), function);
         }
 
-        JloxClass jloxClass = new JloxClass(stmt.name.lexeme(), (JloxClass)superclass,  methods);
+        JloxClass jloxClass = new JloxClass(stmt.name.lexeme(), (JloxClass) superclass, methods);
 
-        if(superclass != null) {
+        if (superclass != null) {
             environment = environment.enclosing;
         }
 
@@ -322,8 +324,8 @@ class Interpreter implements
 
     void executeBlock(List<Stmt> statements, Environment environment) {
         Environment previous = this.environment;
-;
-        try{
+        ;
+        try {
             this.environment = environment;
             for (Stmt statement : statements) {
                 execute(statement);
@@ -371,7 +373,7 @@ class Interpreter implements
         if (stmt.value != null)
             value = evaluate(stmt.value);
 
-        throw  new Return(value);
+        throw new Return(value);
     }
 
     @Override
@@ -386,7 +388,7 @@ class Interpreter implements
     public Void visitVarStmt(Stmt.Var stmt) {
         Object value = null;
 
-        if(stmt.initalizer != null) {
+        if (stmt.initalizer != null) {
             value = evaluate(stmt.initalizer);
         }
 

@@ -38,7 +38,7 @@ public class Jlox {
             System.exit(65);
         }
 
-        if(hadRuntimeError) {
+        if (hadRuntimeError) {
             System.exit(70);
         }
     }
@@ -47,7 +47,7 @@ public class Jlox {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
-        for(;;) {
+        for (; ; ) {
             System.out.print("> ");
             String line = reader.readLine();
             if (line == null) {
@@ -73,13 +73,13 @@ public class Jlox {
         List<Stmt> stmts = parser.parse();
 
         //Stop if there was a syntax errors
-        if(hadError) return;
+        if (hadError) return;
 
         Resolver resolver = new Resolver(interpreter);
         resolver.resolve(stmts);
 
         //Stop if there was a resolution errors
-        if(hadError) return;
+        if (hadError) return;
 
         interpreter.interpret(stmts);
 

@@ -18,12 +18,12 @@ class JloxInstance {
     }
 
     public Object get(Token name) {
-        if(fields.containsKey(name.lexeme())) {
+        if (fields.containsKey(name.lexeme())) {
             return fields.get(name.lexeme());
         }
 
         JloxFunction method = jloxClass.findMethod(name.lexeme());
-        if(method != null) return method.bind(this);
+        if (method != null) return method.bind(this);
 
         throw new RuntimeError(name,
                 "Undefined property '" + name.lexeme() + "'.");

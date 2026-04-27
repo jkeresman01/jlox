@@ -3,7 +3,7 @@ package com.keresman.jlox;
 import java.util.List;
 import java.util.Map;
 
-class JloxClass implements JloxCallable{
+class JloxClass implements JloxCallable {
 
     final String name;
     final JloxClass superclass;
@@ -44,11 +44,11 @@ class JloxClass implements JloxCallable{
     }
 
     JloxFunction findMethod(String name) {
-        if(methods.containsKey(name)) {
+        if (methods.containsKey(name)) {
             return methods.get(name);
         }
 
-        if(superclass != null) {
+        if (superclass != null) {
             return superclass.findMethod(name);
         }
 

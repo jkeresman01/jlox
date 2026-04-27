@@ -7,7 +7,7 @@ import java.util.Stack;
 
 class Resolver implements
         Expr.Visitor<Void>,
-        Stmt.Visitor<Void>{
+        Stmt.Visitor<Void> {
 
     private enum FunctionType {
         NONE,
@@ -86,7 +86,7 @@ class Resolver implements
         if (currentClass == ClassType.NONE) {
             Jlox.error(expr.keyword,
                     "Can't user 'super' outside a class");
-        } else if(currentClass != ClassType.SUBCLASS) {
+        } else if (currentClass != ClassType.SUBCLASS) {
             Jlox.error(expr.keyword,
                     "Can't use 'super' in a class with no superclass");
         }
@@ -115,7 +115,7 @@ class Resolver implements
 
     @Override
     public Void visitVariableExpr(Expr.Variable expr) {
-        if(!scopes.isEmpty()
+        if (!scopes.isEmpty()
                 && scopes.peek().get(expr.name.lexeme()) == Boolean.FALSE) {
             Jlox.error(expr.name,
                     "Can't read local variable in its own initalizer");
@@ -126,8 +126,8 @@ class Resolver implements
     }
 
     private void resolveLocal(Expr expr, Token name) {
-        for(int i = scopes.size() - 1; i > 0; i--) {
-            if(scopes.get(i).containsKey(name.lexeme())) {
+        for (int i = scopes.size() - 1; i > 0; i--) {
+            if (scopes.get(i).containsKey(name.lexeme())) {
                 interpreter.resolve(expr, scopes.size() - 1 - i);
                 return;
             }
@@ -157,9 +157,9 @@ class Resolver implements
         declare(stmt.name);
         define(stmt.name);
 
-        if(stmt.superclass != null &&
-            stmt.name.lexeme().equals(stmt.superclass.name.lexeme())) {
-            Jlox.error(stmt.superclass.name,"A class can't inherit from itself");
+        if (stmt.superclass != null &&
+                stmt.name.lexeme().equals(stmt.superclass.name.lexeme())) {
+            Jlox.error(stmt.superclass.name, "A class can't inherit from itself");
         }
 
         if (stmt.superclass != null) {
@@ -167,7 +167,7 @@ class Resolver implements
             resolve(stmt.superclass);
         }
 
-        if(stmt.superclass != null) {
+        if (stmt.superclass != null) {
             beginScope();
             scopes.peek().put("super", true);
         }
@@ -175,7 +175,7 @@ class Resolver implements
         beginScope();
         scopes.peek().put("this", true);
 
-        for(Stmt.Function method : stmt.methods) {
+        for (Stmt.Function method : stmt.methods) {
             FunctionType declaration = FunctionType.METHOD;
             if (method.name.lexeme().equals("init")) {
                 declaration = FunctionType.INITIALIZER;
@@ -185,7 +185,7 @@ class Resolver implements
 
         endScope();
 
-        if(stmt.superclass != null) {
+        if (stmt.superclass != null) {
             endScope();
         }
 
@@ -201,12 +201,13 @@ class Resolver implements
     }
 
     private void resolve(Stmt statement) {
-       statement.accept(this);
+        statement.accept(this);
     }
 
     private void resolve(Expr expr) {
         expr.accept(this);
     }
+
     private void beginScope() {
         scopes.push(new HashMap<>());
     }
@@ -235,7 +236,7 @@ class Resolver implements
 
         beginScope();
 
-        for(Token param : function.params) {
+        for (Token param : function.params) {
             declare(param);
             define(param);
         }
@@ -266,7 +267,7 @@ class Resolver implements
             Jlox.error(stmt.keyword, "Can't return from top-level code!");
         }
 
-        if(stmt.value != null) {
+        if (stmt.value != null) {
             if (currentFunction == FunctionType.INITIALIZER) {
                 Jlox.error(stmt.keyword,
                         "Can't return a value from an initalizer");
@@ -288,7 +289,7 @@ class Resolver implements
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
         declare(stmt.name);
-        if(stmt.initalizer != null) {
+        if (stmt.initalizer != null) {
             resolve(stmt.initalizer);
         }
         define(stmt.name);
@@ -302,16 +303,16 @@ class Resolver implements
     }
 
     private void declare(Token name) {
-       if(scopes.isEmpty())
-           return;
+        if (scopes.isEmpty())
+            return;
 
-       Map<String, Boolean> scope = scopes.peek();
+        Map<String, Boolean> scope = scopes.peek();
 
-       if (scope.containsKey(name.lexeme())) {
-           Jlox.error(name,
-                   "Already a variable with this name in this scope.");
-       }
+        if (scope.containsKey(name.lexeme())) {
+            Jlox.error(name,
+                    "Already a variable with this name in this scope.");
+        }
 
-       scope.put(name.lexeme(), false);
+        scope.put(name.lexeme(), false);
     }
 }

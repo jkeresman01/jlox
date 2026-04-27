@@ -5,5 +5,5 @@ record Token(
         String lexeme,
         Object literal,
         int line
-)
-{}
+) {
+}

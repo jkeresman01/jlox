@@ -78,12 +78,12 @@ public class GenerateAst {
     private static void defineVisitor(PrintWriter writer,
                                       String baseName,
                                       List<String> types) {
-       writer.println("     interface Visitor<R> {");
+        writer.println("     interface Visitor<R> {");
 
         for (String type : types) {
             String typeName = type.split(":")[0].trim();
             writer.println("                R visit" + typeName + baseName + "(" + typeName
-               + " " + baseName.toLowerCase() + ");");
+                    + " " + baseName.toLowerCase() + ");");
         }
 
         writer.println("     }");
@@ -104,7 +104,7 @@ public class GenerateAst {
         String[] fields = fieldList.split(", ");
         for (String field : fields) {
             String name = field.split(" ")[1];
-            writer.println("           this." + name + " = "  + name  +";");
+            writer.println("           this." + name + " = " + name + ";");
         }
 
         // Constructors closing '}'

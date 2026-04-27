@@ -8,7 +8,8 @@ import static com.keresman.jlox.TokenType.*;
 
 class Parser {
 
-    private static class ParseError extends RuntimeException {}
+    private static class ParseError extends RuntimeException {
+    }
 
     private final List<Token> tokens;
     private int current = 0;
@@ -26,7 +27,7 @@ class Parser {
     private Stmt declaration() {
         try {
             if (match(FUN)) return function("function");
-            if(match(VAR)) return varDeclaration();
+            if (match(VAR)) return varDeclaration();
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -65,7 +66,7 @@ class Parser {
 
         Expr initalizer = null;
 
-        if(match(EQUAL)) {
+        if (match(EQUAL)) {
             initalizer = expression();
         }
 
@@ -74,19 +75,19 @@ class Parser {
     }
 
     private Stmt statement() {
-        if(match(FOR)) return forStatement();
+        if (match(FOR)) return forStatement();
 
-        if(match(IF)) return ifStatement();
+        if (match(IF)) return ifStatement();
 
-        if(match(PRINT)) return printStatement();
+        if (match(PRINT)) return printStatement();
 
         if (match(CLASS)) return classDeclaration();
 
-        if(match(RETURN)) return returnStatement();
+        if (match(RETURN)) return returnStatement();
 
-        if(match(WHILE)) return whileStatement();
+        if (match(WHILE)) return whileStatement();
 
-        if(match(LEFT_BRACE)) {
+        if (match(LEFT_BRACE)) {
             return new Stmt.Block(block());
         }
 
@@ -118,7 +119,7 @@ class Parser {
 
         Expr value = null;
 
-        if(!check(SEMICOLON)) {
+        if (!check(SEMICOLON)) {
             value = expression();
         }
 
@@ -130,7 +131,7 @@ class Parser {
         consume(LEFT_PAREN, "Expect '(' after 'for'.");
 
         Stmt initalizer;
-        if(match(SEMICOLON)) {
+        if (match(SEMICOLON)) {
             initalizer = null;
         } else if (match(VAR)) {
             initalizer = varDeclaration();
@@ -139,13 +140,13 @@ class Parser {
         }
 
         Expr condition = null;
-        if(!check(SEMICOLON)) {
+        if (!check(SEMICOLON)) {
             condition = expression();
         }
         consume(SEMICOLON, "Expected ';' after loop condition");
 
         Expr increment = null;
-        if(!check(RIGHT_PAREN)) {
+        if (!check(RIGHT_PAREN)) {
             increment = expression();
         }
         consume(RIGHT_PAREN, "Expect ')' after the clauses.");
@@ -166,7 +167,7 @@ class Parser {
 
         body = new Stmt.While(condition, body);
 
-        if(initalizer != null) {
+        if (initalizer != null) {
             body = new Stmt.Block(List.of(initalizer, body));
         }
 
@@ -190,7 +191,7 @@ class Parser {
         Stmt thenBranch = statement();
         Stmt elseBranch = null;
 
-        if(match(ELSE)) {
+        if (match(ELSE)) {
             elseBranch = statement();
         }
 
@@ -201,7 +202,7 @@ class Parser {
     private List<Stmt> block() {
         List<Stmt> statements = new ArrayList<>();
 
-        while(!check(RIGHT_BRACE) && !isAtEnd()) {
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
             statements.add(declaration());
         }
 
@@ -232,11 +233,11 @@ class Parser {
     private Expr assignment() {
         Expr expr = or();
 
-        if(match(EQUAL)) {
+        if (match(EQUAL)) {
             Token equals = previous();
             Expr value = assignment();
 
-            if(expr instanceof Expr.Variable exprVar) {
+            if (expr instanceof Expr.Variable exprVar) {
                 Token name = exprVar.name;
                 return new Expr.Assign(name, value);
             }
@@ -250,7 +251,7 @@ class Parser {
     private Expr or() {
         Expr expr = and();
 
-        while(match(OR)) {
+        while (match(OR)) {
             Token operator = previous();
             Expr right = and();
             expr = new Expr.Logical(expr, operator, right);
@@ -262,7 +263,7 @@ class Parser {
     private Expr and() {
         Expr expr = equality();
 
-        while(match(AND)) {
+        while (match(AND)) {
             Token operator = previous();
             Expr right = equality();
             expr = new Expr.Logical(expr, operator, right);
@@ -292,6 +293,7 @@ class Parser {
 
         return false;
     }
+
     private boolean check(TokenType tokenType) {
         if (isAtEnd())
             return false;
@@ -308,7 +310,7 @@ class Parser {
     }
 
     private Token advance() {
-        if(!isAtEnd())
+        if (!isAtEnd())
             current++;
 
         return previous();
@@ -321,7 +323,7 @@ class Parser {
     private Expr comparison() {
         Expr expr = term();
 
-        while(match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+        while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
             Token operator = previous();
             Expr right = term();
             expr = new Expr.Binary(expr, operator, right);
@@ -333,7 +335,7 @@ class Parser {
     private Expr term() {
         Expr expr = factor();
 
-        while(match(MINUS, PLUS)) {
+        while (match(MINUS, PLUS)) {
             Token operator = previous();
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
@@ -341,6 +343,7 @@ class Parser {
 
         return expr;
     }
+
     private Expr factor() {
         Expr expr = unary();
 
@@ -354,7 +357,7 @@ class Parser {
     }
 
     private Expr unary() {
-        if(match(BANG, MINUS)) {
+        if (match(BANG, MINUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
@@ -366,14 +369,14 @@ class Parser {
     private Expr call() {
         Expr expr = primary();
 
-        while(true) {
-            if(match(LEFT_PAREN)) {
+        while (true) {
+            if (match(LEFT_PAREN)) {
                 expr = finishCall(expr);
-            } else if(match(DOT)) {
+            } else if (match(DOT)) {
                 Token name = consume(IDENTIFIER,
                         "Expect property name after '.'.");
                 expr = new Expr.Get(expr, name);
-            } else  {
+            } else {
                 break;
             }
         }
@@ -386,7 +389,7 @@ class Parser {
 
         if (!check(RIGHT_PAREN)) {
             do {
-                if(arguments.size() > 255) {
+                if (arguments.size() > 255) {
                     error(peek(), "Can't have more than 255 arguments!");
                 }
 
@@ -400,11 +403,11 @@ class Parser {
     }
 
     private Expr primary() {
-        if(match(FALSE)) return new Expr.Literal(false);
-        if(match(TRUE)) return new Expr.Literal(true);
-        if(match(NIL)) return new Expr.Literal(null);
+        if (match(FALSE)) return new Expr.Literal(false);
+        if (match(TRUE)) return new Expr.Literal(true);
+        if (match(NIL)) return new Expr.Literal(null);
 
-        if(match(NUMBER, STRING)) {
+        if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal());
         }
 
@@ -412,7 +415,7 @@ class Parser {
             return new Expr.This(previous());
         }
 
-        if(match(IDENTIFIER)) {
+        if (match(IDENTIFIER)) {
             return new Expr.Variable(previous());
         }
 
@@ -461,7 +464,7 @@ class Parser {
         }
     }
 
-    private ParseError error(Token token, String message)  {
+    private ParseError error(Token token, String message) {
         Jlox.error(token, message);
         return new ParseError();
     }

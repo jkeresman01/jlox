@@ -43,7 +43,7 @@ class Scanner {
     }
 
     List<Token> scanTokens() {
-        while(!isAtEnd()) {
+        while (!isAtEnd()) {
             start = current;
             scanToken();
         }
@@ -55,17 +55,37 @@ class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '(' : addToken(LEFT_PAREN); break;
-            case ')' : addToken(RIGHT_PAREN); break;
-            case '{' : addToken(LEFT_BRACE); break;
-            case '}' : addToken(RIGHT_BRACE); break;
-            case ',' : addToken(COMMA); break;
-            case '.' : addToken(DOT); break;
-            case '-' : addToken(MINUS); break;
-            case '+' : addToken(PLUS); break;
-            case ';' : addToken(SEMICOLON); break;
-            case '*' : addToken(STAR); break;
-            case '!' :
+            case '(':
+                addToken(LEFT_PAREN);
+                break;
+            case ')':
+                addToken(RIGHT_PAREN);
+                break;
+            case '{':
+                addToken(LEFT_BRACE);
+                break;
+            case '}':
+                addToken(RIGHT_BRACE);
+                break;
+            case ',':
+                addToken(COMMA);
+                break;
+            case '.':
+                addToken(DOT);
+                break;
+            case '-':
+                addToken(MINUS);
+                break;
+            case '+':
+                addToken(PLUS);
+                break;
+            case ';':
+                addToken(SEMICOLON);
+                break;
+            case '*':
+                addToken(STAR);
+                break;
+            case '!':
                 addToken(match('=') ? BANG_EQUAL : BANG);
                 break;
             case '=':
@@ -78,9 +98,9 @@ class Scanner {
                 addToken(match('=') ? GREATER_EQUAL : GREATER);
                 break;
             case '/':
-                if(match('/')) {
+                if (match('/')) {
                     //A comment goes until the end of the line.
-                    while(peek() != '\n' && !isAtEnd())
+                    while (peek() != '\n' && !isAtEnd())
                         advance();
                 } else {
                     addToken(SLASH);
@@ -89,17 +109,16 @@ class Scanner {
             case '\r':
             case '\t':
                 break;
-            case '\n' :
+            case '\n':
                 line++;
                 break;
             case '"':
                 string();
                 break;
             default:
-                if(isDigit(c)) {
+                if (isDigit(c)) {
                     number();
-                }
-                else if (isAlpha(c)) {
+                } else if (isAlpha(c)) {
                     identifier();
                 } else {
                     Jlox.error(line, "Unexpected character.");
@@ -125,7 +144,7 @@ class Scanner {
 
     private boolean isAlpha(char c) {
         return (c >= 'a' && c <= 'z') ||
-               (c >= 'A' && c <= 'Z') ||
+                (c >= 'A' && c <= 'Z') ||
                 c == '_';
     }
 
@@ -147,7 +166,7 @@ class Scanner {
     }
 
     private char peekNext() {
-        if(current + 1 >= source.length())
+        if (current + 1 >= source.length())
             return '\0';
 
         return source.charAt(current + 1);
@@ -158,13 +177,13 @@ class Scanner {
     }
 
     private void string() {
-        while(peek() != '"' && !isAtEnd()) {
+        while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n')
                 line++;
             advance();
         }
 
-        if(isAtEnd()) {
+        if (isAtEnd()) {
             Jlox.error(line, "Unterminated string.");
             return;
         }

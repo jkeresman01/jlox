@@ -2,7 +2,7 @@ package com.keresman.jlox;
 
 import java.util.List;
 
-class JloxFunction implements JloxCallable{
+class JloxFunction implements JloxCallable {
 
     private final Stmt.Function declaration;
     private final Environment closure;
@@ -37,7 +37,7 @@ class JloxFunction implements JloxCallable{
             );
         }
 
-        try{
+        try {
             interpreter.executeBlock(declaration.body, environment);
         } catch (Return returnValue) {
             if (isInitalizer) {
