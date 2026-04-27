@@ -92,10 +92,6 @@ class Scanner {
             case '\n' :
                 line++;
                 break;
-            case 'o':
-                if(match('r'))
-                    addToken(OR);
-                break;
             case '"':
                 string();
                 break;
